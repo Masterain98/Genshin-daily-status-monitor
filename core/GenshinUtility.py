@@ -8,6 +8,7 @@ import requests
 
 from core.settings import *
 
+
 class GenshinID(object):
     def __init__(self, genshinID: str):
         self.GenshinID = genshinID
@@ -44,11 +45,9 @@ class GenshinID(object):
         if data["retcode"] != 0:
             if data["retcode"] == 10001:
                 os.remove("cookie.txt")
-                return "Cookie错误/过期，请重置Cookie"
-            return (
-                    "Api报错，返回内容为：\r\n"
-                    + data + "\r\n出现这种情况可能是UID输入错误 or 不存在"
-            )
+                return {"result": "Cookie错误/过期，请重置Cookie"}
+            retcode_error_report = "Api报错，返回内容为：\r\n"+ str(data) + "\r\n出现这种情况可能是UID输入错误 or 不存在"
+            return {"result": retcode_error_report}
         else:
             pass
         data = data['data']
@@ -81,14 +80,14 @@ class GenshinID(object):
         expedition_count = 1
         expedition_status_report = "派遣任务状态："
         # lowest_expedition_remain_time_hours: 默认轮询时间
-        lowest_expedition_remain_time_hours = default_roll_polling_time
+        lowest_expedition_remain_time = default_roll_polling_time
         for expedition in current_expedition_list:
             expedition_status_report += ("派遣任务" + str(expedition_count) + "：\n")
             expedition_status_report += ("状态：" + str(expedition['status']) + "\n")
             if str(expedition['status']) != "Finished":
                 expedition_remain_time = expedition['remained_time']
-                if int(expedition_remain_time) < lowest_expedition_remain_time_hours:
-                    lowest_expedition_remain_time_hours = int(expedition_remain_time)
+                if int(expedition_remain_time) < lowest_expedition_remain_time:
+                    lowest_expedition_remain_time = int(expedition_remain_time)
                 expedition_remain_time_hours = str(datetime.timedelta(seconds=int(expedition_remain_time)))
                 expected_expedition_remain_time = str(
                     datetime.datetime.now() + datetime.timedelta(seconds=int(expedition_remain_time)))
@@ -107,8 +106,12 @@ class GenshinID(object):
 
         report_string = resin_report + "\n" + resin_recovery_report + "\n" + daily_task_report + "\n" + weekly_challenge_report + "\n" + expedition_report + "\n" + expedition_status_report
         print(report_string)
-        return_dict = {'resin_recovery_time_hours': resin_recovery_time_hours, 'expedition_remain_time_hours': lowest_expedition_remain_time_hours, 'report_string': report_string}
+        return_dict = {'result': "OK",
+                       'resin_recovery_time_hours': resin_recovery_time,
+                       'expedition_remain_time_hours': lowest_expedition_remain_time,
+                       'report_string': report_string}
         return return_dict
+
 
 def md5(text):
     md5 = hashlib.md5()
