@@ -17,6 +17,15 @@ class GenshinID(object):
         print(self.GenshinID)
 
     def getDailyNote(self):
+        """
+        Get Daily Note data and return in a dictionary
+        :return:
+        - dict[result]: OK for successful function running, else return error log
+        - dict[resin_recovery_time]: Remaining time in seconds for resin fully recovered
+        - dict[expedition_remain_time]: Remaining time in seconds for next finishing expedition
+        - dict[report_string]: Function report in string used to show to user
+        """
+
         cookie_txt = open("./config/cookie.txt", mode="r+")
         cookie = cookie_txt.read()
         cookie_txt.close()
@@ -107,8 +116,8 @@ class GenshinID(object):
         report_string = resin_report + "\n" + resin_recovery_report + "\n" + daily_task_report + "\n" + weekly_challenge_report + "\n" + expedition_report + "\n" + expedition_status_report
         print(report_string)
         return_dict = {'result': "OK",
-                       'resin_recovery_time_hours': resin_recovery_time,
-                       'expedition_remain_time_hours': lowest_expedition_remain_time,
+                       'resin_recovery_time': resin_recovery_time,
+                       'expedition_remain_time': lowest_expedition_remain_time,
                        'report_string': report_string}
         return return_dict
 
